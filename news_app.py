@@ -1,15 +1,12 @@
 from tkinter import *
 from tkinter import messagebox
-from urllib.parse import urlencode
 import os
 import requests
 
 # Constants
-API_KEY = os.getenv("NEWSAPI_KEY", "24998c027203417cb77e2d0609741910")
-BASE_URL = (
-    'http://newsapi.org/v2/top-headlines?country=in&category={}&apiKey=' + API_KEY
-)
-EVERYTHING_URL = 'https://newsapi.org/v2/everything?'
+API_KEY = os.getenv("NEWSAPI_KEY")
+BASE_URL = "https://newsapi.org/v2/top-headlines?country=in&category={}&apiKey={}"
+EVERYTHING_URL = "https://newsapi.org/v2/everything"
 
 class NewsApp:
     def __init__(self, root):
@@ -138,7 +135,10 @@ class NewsApp:
         self.news_text_area.pack(fill=BOTH, expand=1)
 
     def display_news(self, category):
-        url = BASE_URL.format(category)
+        if not API_KEY:
+            messagebox.showerror("Error", "NEWSAPI_KEY environment variable not set")
+            return
+        url = BASE_URL.format(category, API_KEY)
         self.news_text_area.delete("1.0", END)
         self.news_text_area.insert(END, f"Fetching news for category: {category.upper()}...\n\n")
 
@@ -173,18 +173,20 @@ class NewsApp:
             messagebox.showerror("Error", "Please enter a keyword to search.")
             return
 
+        if not API_KEY:
+            messagebox.showerror("Error", "NEWSAPI_KEY environment variable not set")
+            return
         params = {"q": query, "apiKey": API_KEY, "language": language}
         if source:
             params["sources"] = source
         if from_date:
             params["from"] = from_date
-        url = EVERYTHING_URL + urlencode(params)
 
         self.news_text_area.delete("1.0", END)
         self.news_text_area.insert(END, f"Searching for: {query}\n\n")
 
         try:
-            response = requests.get(url)
+            response = requests.get(EVERYTHING_URL, params=params, timeout=10)
             response.raise_for_status()
             articles = response.json().get("articles", [])
 
@@ -206,9 +208,11 @@ class NewsApp:
     def generate_html(self, articles, filename="search_results.html"):
         try:
             with open(filename, "w", encoding="utf-8") as html_file:
-                html_file.write(
-                    "<html><head><meta charset='utf-8'><title>Search Results" "</title></head><body>"
-                )
+                html_file.write("""
+<html>
+  <head><meta charset='utf-8'><title>Search Results</title></head>
+  <body>
+""")
                 for article in articles:
                     html_file.write(
                         f"<h2><a href='{article['url']}'>{article['title']}</a></h2>"

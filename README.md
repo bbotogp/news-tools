@@ -109,6 +109,7 @@ News API. In addition to browsing predefined categories, it now supports
 real‑time search across multiple sources and languages. Run the application with:
 
 ```bash
+export NEWSAPI_KEY="your_api_key"
 python news_app.py
 ```
 
