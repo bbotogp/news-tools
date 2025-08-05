@@ -101,3 +101,17 @@ Another option is hardcoding your console to only print in utf-8. This is a bad 
 
 Feel free to make suggestions or provide feedback regarding the library. Thanks.
 Reach out at [lisivickmatt@gmail.com]('mailto:lisivickmatt@gmail.com')
+
+## Example Application
+
+The repository includes `news_app.py`, a simple Tkinter-based reader for the
+News API. In addition to browsing predefined categories, it now supports
+real‑time search across multiple sources and languages. Run the application with:
+
+```bash
+python news_app.py
+```
+
+Enter a keyword, optional source, and date in the search panel and choose
+English or Arabic. Results are shown in the interface and saved to
+`search_results.html` for convenient viewing in a browser.
